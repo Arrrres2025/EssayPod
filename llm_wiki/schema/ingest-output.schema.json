@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LLM Wiki ingest result",
+  "type": "object",
+  "required": ["source", "pages", "overview", "glossary", "knowledge"],
+  "properties": {
+    "source": {
+      "type": "object",
+      "required": ["title", "summary", "key_claims", "key_quotes", "tags"],
+      "properties": {
+        "title": {"type": "string"},
+        "summary": {"type": "string"},
+        "key_claims": {"type": "array", "items": {"type": "string"}},
+        "key_quotes": {"type": "array", "items": {"type": "string"}},
+        "tags": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "title", "summary", "facts", "connections", "contradictions"],
+        "properties": {
+          "kind": {"enum": ["entity", "concept", "comparison", "synthesis"]},
+          "title": {"type": "string"},
+          "summary": {"type": "string"},
+          "facts": {"type": "array", "items": {"type": "string"}},
+          "connections": {"type": "array", "items": {"type": "string"}},
+          "contradictions": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "required": ["summary", "themes", "open_questions"],
+      "properties": {
+        "summary": {"type": "string"},
+        "themes": {"type": "array", "items": {"type": "string"}},
+        "open_questions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "glossary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "definition"],
+        "properties": {
+          "term": {"type": "string"},
+          "definition": {"type": "string"}
+        }
+      }
+    },
+    "knowledge": {
+      "type": "object",
+      "required": ["nodes", "edges", "evidence"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "evidence_ids"],
+            "properties": {
+              "id": {"type": "string"},
+              "type": {
+                "enum": ["Concept", "Claim", "Method", "Dataset", "Experiment", "Metric", "Result", "Limitation", "Hypothesis", "Definition", "ResearchQuestion"]
+              },
+              "label": {"type": "string"},
+              "summary": {"type": "string"},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+              "status": {"type": "string"},
+              "evidence_ids": {"type": "array", "items": {"type": "string"}}
+            },
+            "additionalProperties": true
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "relation", "target"],
+            "properties": {
+              "source": {"type": "string"},
+              "relation": {"type": "string"},
+              "target": {"type": "string"},
+              "qualifiers": {"type": "object"},
+              "evidence_ids": {"type": "array", "items": {"type": "string"}},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "quote"],
+            "properties": {
+              "id": {"type": "string"},
+              "page": {"type": ["integer", "null"]},
+              "section": {"type": "string"},
+              "chunk_id": {"type": "string"},
+              "quote": {"type": "string"},
+              "evidence_role": {"type": "string"},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}

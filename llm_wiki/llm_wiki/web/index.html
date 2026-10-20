@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Wiki Compiler</title>
+  <meta name="description" content="把不可变材料编译成持续积累的 Markdown Wiki。">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark">W</span>
+      <span>LLM Wiki Compiler</span>
+    </a>
+    <span id="provider" class="provider">正在连接…</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">PERSISTENT KNOWLEDGE · KARPATHY PATTERN</p>
+        <h1>材料不是被索引，<br><em>而是被编译。</em></h1>
+        <p class="lead">上传论文或文档，让 LLM 将其整合进一个持久、互链、可追溯的 Markdown Wiki。</p>
+      </div>
+      <div class="layer-map" aria-label="Karpathy 的三层结构">
+        <div><span>01</span><strong>Raw Sources</strong><small>不可变事实来源</small></div>
+        <b>→</b>
+        <div><span>02</span><strong>LLM Wiki</strong><small>持续累积的知识</small></div>
+        <b>←</b>
+        <div><span>03</span><strong>Schema</strong><small>维护规则与契约</small></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="知识库统计">
+      <div><strong id="sourceCount">0</strong><span>Raw sources</span></div>
+      <div><strong id="pageCount">0</strong><span>Wiki pages</span></div>
+      <div><strong id="entityCount">0</strong><span>Entities</span></div>
+      <div><strong id="conceptCount">0</strong><span>Concepts</span></div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel ingest-panel">
+        <div class="panel-head">
+          <span class="step">INGEST</span>
+          <h2>编译一份新材料</h2>
+          <p>PDF、Markdown、TXT、HTML、CSV、RST 或 JSON。原文件保存后不会被修改。</p>
+        </div>
+        <form id="ingestForm">
+          <label class="dropzone" id="dropzone">
+            <input id="file" name="file" type="file" required accept=".pdf,.md,.markdown,.txt,.html,.htm,.csv,.rst,.json">
+            <span class="drop-symbol">＋</span>
+            <strong id="fileLabel">选择文件或拖放到这里</strong>
+            <small>最大 25 MB</small>
+          </label>
+          <label class="field">
+            <span>希望 LLM 特别关注什么？</span>
+            <textarea id="focus" name="focus" rows="3" placeholder="例如：重点提取研究问题、方法、实验结论与局限性"></textarea>
+          </label>
+          <button class="primary" type="submit">开始编译 Wiki</button>
+        </form>
+        <div id="ingestResult" class="result" hidden></div>
+      </div>
+
+      <div class="panel query-panel">
+        <div class="panel-head">
+          <span class="step">QUERY</span>
+          <h2>向已编译的 Wiki 提问</h2>
+          <p>系统先读取 Index，再选择 Wiki 页面；不会回到原始材料重新拼接。</p>
+        </div>
+        <form id="queryForm">
+          <label class="field">
+            <span>问题</span>
+            <textarea id="question" rows="4" required placeholder="这些论文对同一个问题有哪些一致和冲突的结论？"></textarea>
+          </label>
+          <label class="check"><input id="saveAnswer" type="checkbox"> 将答案沉淀为 Synthesis 页面</label>
+          <button class="secondary" type="submit">查询 Wiki</button>
+        </form>
+        <div id="queryResult" class="result prose" hidden></div>
+      </div>
+    </section>
+
+    <section class="research">
+      <div class="research-head">
+        <div>
+          <span class="step">BACKGROUND RESEARCH</span>
+          <h2>补全背景概念</h2>
+          <p>系统在后台自动搜索缺失概念，使用排名前三的网页来源，再由 Ark 生成带有临时状态和完整溯源的 Concept 页面。</p>
+        </div>
+        <span id="tavilyStatus" class="research-status">正在检查 Tavily…</span>
+      </div>
+      <form id="researchForm" class="research-form">
+        <label class="field research-input">
+          <span>概念名称或 Pending ID</span>
+          <input id="researchConcept" required minlength="2" maxlength="100" placeholder="例如：LoRA">
+        </label>
+        <button class="secondary" type="submit">搜索网页来源</button>
+      </form>
+      <div class="research-layout">
+        <div>
+          <h3>待补全概念</h3>
+              <p class="section-help">由 Wiki 中尚未解析的 <code>[[wikilink]]</code> 自动汇总并排队补全；也可手动重试。</p>
+          <div id="pendingConcepts" class="pending-list"></div>
+        </div>
+        <div id="candidatePanel" class="candidate-panel" hidden>
+          <div class="candidate-head">
+            <div>
+              <h3 id="candidateTitle">候选来源</h3>
+              <p class="section-help">默认选中排名前三的来源。实际网页内容会保存为不可变证据。</p>
+            </div>
+          </div>
+          <form id="candidateForm">
+            <div id="candidates" class="candidate-list"></div>
+            <button class="primary" type="submit">用所选来源创建临时 Concept</button>
+          </form>
+        </div>
+      </div>
+      <div id="researchResult" class="result" hidden></div>
+    </section>
+
+    <section class="library">
+      <div class="library-head">
+        <div>
+          <span class="step">WIKI</span>
+          <h2>持久知识页面</h2>
+        </div>
+        <div class="library-actions">
+          <a class="ghost graph-link" href="/graph">打开 Pixi Graph View</a>
+          <button id="lintButton" class="ghost" type="button">运行 Wiki Lint</button>
+        </div>
+      </div>
+      <div class="library-grid">
+        <div id="pages" class="page-list"></div>
+        <article id="viewer" class="viewer">
+          <p class="empty">上传第一份材料后，这里会出现 Source、Entity 与 Concept 页面。</p>
+        </article>
+      </div>
+      <div id="lintResult" class="result" hidden></div>
+    </section>
+  </main>
+
+  <footer>Human curates · LLM maintains · Wiki compounds</footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>

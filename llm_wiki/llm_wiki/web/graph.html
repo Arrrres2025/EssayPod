@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pixi Graph View · LLM Wiki</title>
+  <meta name="description" content="使用 Logseq 同款 PixiJS 与 d3-force 技术路线渲染 LLM Wiki。">
+  <link rel="stylesheet" href="/static/graph.css">
+</head>
+<body>
+  <main class="graph-shell">
+    <header class="graph-header">
+      <div>
+        <a href="/" class="back">LLM Wiki</a>
+        <div class="title-row">
+          <h1>Knowledge Graph</h1>
+          <span class="tech">Pixi Graph View</span>
+        </div>
+        <p id="graphDescription">页面是节点，<code>[[wikilink]]</code> 是连接</p>
+      </div>
+      <div class="graph-mode-switch" role="tablist" aria-label="知识图谱层级">
+        <button type="button" role="tab" data-graph-mode="page" aria-selected="true">页面图</button>
+        <button type="button" role="tab" data-graph-mode="atomic" aria-selected="false">原子知识图</button>
+      </div>
+    </header>
+
+    <section class="graph-stage">
+      <div id="canvasHost" class="canvas-host" aria-label="可交互知识图谱"></div>
+
+      <aside class="controls">
+        <label>
+          <span>邻域深度 <output id="depthValue">1</output></span>
+          <input id="depth" type="range" min="1" max="3" value="1">
+        </label>
+        <label>
+          <span>链接距离 <output id="distanceValue">92</output></span>
+          <input id="distance" type="range" min="56" max="160" value="92">
+        </label>
+        <button id="resetView" type="button">适应画布</button>
+      </aside>
+
+      <aside id="graphLegend" class="legend">
+        <span><i class="concept"></i>Concept</span>
+        <span><i class="entity"></i>Entity</span>
+        <span><i class="source"></i>Source</span>
+        <span><i class="synthesis"></i>Synthesis</span>
+        <span><i class="pending"></i>Pending</span>
+      </aside>
+
+      <section id="inspector" class="inspector is-empty" aria-live="polite">
+        <span class="inspector-type">SELECT A NODE</span>
+        <h2>探索知识连接</h2>
+        <p>点击任意节点，查看它在指定深度内的知识邻域。</p>
+      </section>
+
+      <div id="emptyState" class="empty-state" hidden>
+        <strong>当前 Wiki 还没有可绘制的页面</strong>
+        <span>先上传材料进行编译，Graph 会自动显示新页面和链接。</span>
+      </div>
+      <div id="tooltip" class="tooltip" hidden></div>
+    </section>
+
+    <footer>
+      <span id="graphStats">0 nodes · 0 links</span>
+      <span>滚轮缩放 · 拖动画布 · 点击节点查看邻域</span>
+    </footer>
+  </main>
+  <section id="pageOverlay" class="page-overlay" role="dialog" aria-modal="true" aria-label="Wiki page details" hidden>
+    <iframe id="pageFrame" class="page-frame" title="Wiki page details"></iframe>
+  </section>
+  <script type="module" src="/static/graph.js"></script>
+</body>
+</html>

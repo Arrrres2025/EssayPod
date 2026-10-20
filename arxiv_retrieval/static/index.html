@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EssayPod · arXiv 自动推送</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div>
+          <h1>arXiv 自动推送</h1>
+          <p>
+            两种订阅模式：按分类 RSS 拉取，或按关键词 Query API 订阅。配置周期与篇数后可定时运行，也可立即试拉。
+          </p>
+        </div>
+        <div class="badge">Local Preview</div>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="category">分类 RSS</button>
+        <button class="tab" data-tab="keyword">关键词订阅</button>
+      </nav>
+
+      <!-- Category mode -->
+      <section class="panel active" id="panel-category">
+        <aside class="sidebar">
+          <h2>分类订阅</h2>
+          <p class="hint">从下方 taxonomy 多选 arXiv 分类，优先 RSS；周末 RSS 为空时自动回退 Query API。</p>
+
+          <div class="field">
+            <div class="toggle">
+              <input type="checkbox" id="cat-enabled" />
+              <span>启用自动拉取</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cat-period">拉取周期</label>
+            <select id="cat-period"></select>
+          </div>
+          <div class="field">
+            <label for="cat-time-mode">拉取时间</label>
+            <select id="cat-time-mode">
+              <option value="now">立即（测试）</option>
+              <option value="scheduled">定时</option>
+            </select>
+          </div>
+          <div class="field" id="cat-time-wrap" hidden>
+            <label for="cat-time">定时时刻</label>
+            <input type="time" id="cat-time" value="09:00" />
+          </div>
+
+          <div class="field">
+            <label for="cat-max">每次篇数</label>
+            <input type="number" id="cat-max" min="1" max="100" value="20" />
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="cat-save">保存设置</button>
+            <button class="ghost" id="cat-run">立即拉取</button>
+          </div>
+          <div class="status" id="cat-status">尚未运行</div>
+        </aside>
+
+        <div class="main">
+          <div class="results-block" id="cat-results-block">
+            <div class="toolbar">
+              <h3>最新结果</h3>
+              <div class="meta" id="cat-result-meta">暂无数据</div>
+            </div>
+            <div class="papers" id="cat-papers"></div>
+          </div>
+
+          <div class="toolbar" style="margin-top: 22px">
+            <h3>选择分类</h3>
+            <div class="meta" id="cat-selected-count">已选 0</div>
+          </div>
+          <input
+            class="search-box field"
+            id="cat-filter"
+            type="text"
+            placeholder="搜索分类，如 CL / Artificial / Information Retrieval"
+            style="padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px"
+          />
+          <div id="taxonomy" class="taxonomy-scroll"></div>
+        </div>
+      </section>
+
+      <!-- Keyword mode -->
+      <section class="panel" id="panel-keyword">
+        <aside class="sidebar">
+          <h2>关键词订阅</h2>
+          <p class="hint">
+            添加并多选关键词后按周期自动查询（非即时搜索框）。适合 Agent、Retrieval 等跨分类主题。
+          </p>
+
+          <div class="field">
+            <div class="toggle">
+              <input type="checkbox" id="kw-enabled" />
+              <span>启用自动拉取</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="kw-period">拉取周期</label>
+            <select id="kw-period"></select>
+          </div>
+          <div class="field">
+            <label for="kw-time-mode">拉取时间</label>
+            <select id="kw-time-mode">
+              <option value="now">立即（测试）</option>
+              <option value="scheduled">定时</option>
+            </select>
+          </div>
+          <div class="field" id="kw-time-wrap" hidden>
+            <label for="kw-time">定时时刻</label>
+            <input type="time" id="kw-time" value="09:00" />
+          </div>
+
+          <div class="field">
+            <label for="kw-max">每次篇数</label>
+            <input type="number" id="kw-max" min="1" max="100" value="20" />
+          </div>
+
+          <div class="field">
+            <label>匹配字段</label>
+            <div class="toggle" style="margin-bottom: 8px">
+              <input type="checkbox" id="kw-title" checked />
+              <span>标题</span>
+            </div>
+            <div class="toggle">
+              <input type="checkbox" id="kw-abs" checked />
+              <span>摘要</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="kw-save">保存设置</button>
+            <button class="ghost" id="kw-run">立即拉取</button>
+          </div>
+          <div class="status" id="kw-status">尚未运行</div>
+        </aside>
+
+        <div class="main">
+          <div class="results-block" id="kw-results-block">
+            <div class="toolbar">
+              <h3>最新结果</h3>
+              <div class="meta" id="kw-result-meta">暂无数据</div>
+            </div>
+            <div class="papers" id="kw-papers"></div>
+          </div>
+
+          <div class="toolbar" style="margin-top: 22px">
+            <h3>关键词列表</h3>
+            <div class="meta" id="kw-count">0 个关键词</div>
+          </div>
+          <div class="keyword-box">
+            <input type="text" id="kw-input" placeholder="输入关键词后回车，例如 Agent / RAG" />
+            <button class="primary" id="kw-add">添加</button>
+          </div>
+          <div class="chips" id="kw-chips"></div>
+        </div>
+      </section>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

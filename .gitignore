@@ -1,0 +1,95 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*credentials*.json
+
+# macOS and editor metadata
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python environments and caches
+.venv/
+venv/
+env/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# JavaScript dependencies and build output
+node_modules/
+**/node_modules/
+.next/
+.vinext/
+.vite/
+.vercel/
+.wrangler/
+web_ui/dist/
+web_ui/out/
+web_ui/.openai/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# EssayPod runtime data (may contain private or copyrighted papers)
+tasks/
+outputs/
+usage/
+*.log
+*.pid
+*.partial
+
+# Generated LLM Wiki content and uploaded source documents
+llm_wiki/raw/
+llm_wiki/wiki/
+llm_wiki/runtime/
+llm_wiki/backups/
+llm_wiki/.obsidian/
+
+# Local backups and packaged applications
+ui_backups/
+*.app/
+*.zip
+
+# Inactive upstream source snapshots kept only for local reference
+chatbot/kotaemon-main/
+chatbot/ragflow-main/
+chatbot/paper-qa-main/
+
+# arXiv retrieval runtime state
+arxiv_retrieval/data/*_config.json
+arxiv_retrieval/data/*_latest.json
+arxiv_retrieval/data/*_seen.json
+arxiv_retrieval/data/*.tmp
+
+# PDFMathTranslate generated files
+translation_block/pdf2zh_files/
+translation_block/gui/pdf2zh_files/
+translation_block/gradio_files/
+translation_block/tmp/
+translation_block/gui/gradio_files/
+translation_block/gui/tmp/
+translation_block/**/*.csv
+translation_block/**/*.pdf
+translation_block/**/*.docx
+

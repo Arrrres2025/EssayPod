@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "paper-knowledge.schema.json",
+  "title": "EssayPod atomic paper knowledge package",
+  "type": "object",
+  "required": ["schema_version", "source", "nodes", "edges", "evidence", "validation"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "generated_at": {"type": "string"},
+    "source": {
+      "type": "object",
+      "required": ["id", "title", "path", "wiki_page"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^paper::"},
+        "title": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "wiki_page": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "edges": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/edge"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence"}
+    },
+    "validation": {
+      "type": "object",
+      "required": ["valid", "warnings"],
+      "properties": {
+        "valid": {"type": "boolean"},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "required": ["id", "type", "label", "source_id", "scope", "confidence", "status", "evidence_ids", "attributes"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {
+          "enum": ["Concept", "Claim", "Method", "Dataset", "Experiment", "Metric", "Result", "Limitation", "Hypothesis", "Definition", "ResearchQuestion"]
+        },
+        "label": {"type": "string", "minLength": 1},
+        "summary": {"type": "string"},
+        "source_id": {"type": "string", "pattern": "^paper::"},
+        "scope": {"enum": ["global", "paper_local"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "status": {"type": "string", "minLength": 1},
+        "evidence_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "attributes": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "required": ["id", "source", "relation", "target", "qualifiers", "evidence_ids", "confidence", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^edge::"},
+        "source": {"type": "string", "minLength": 1},
+        "relation": {
+          "enum": ["investigates", "proposes", "defines", "introduces", "uses", "tested_by", "evaluated_on", "measured_by", "compared_with", "uses_baseline", "produces", "supports", "partially_supports", "refutes", "contradicts", "answers", "based_on", "extends", "implements", "applies", "component_of", "limits", "fails_on", "not_evaluated_on", "grounded_in", "reported_by", "derived_from"]
+        },
+        "target": {"type": "string", "minLength": 1},
+        "qualifiers": {"type": "object"},
+        "evidence_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "status": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "type", "source_id", "source_path", "page", "section", "chunk_id", "quote", "evidence_role", "confidence", "verified"],
+      "properties": {
+        "id": {"type": "string", "pattern": "::evidence::"},
+        "type": {"const": "EvidenceSpan"},
+        "source_id": {"type": "string", "pattern": "^paper::"},
+        "source_path": {"type": "string", "minLength": 1},
+        "page": {"type": ["integer", "null"], "minimum": 1},
+        "section": {"type": "string"},
+        "chunk_id": {"type": "string"},
+        "quote": {"type": "string", "minLength": 1},
+        "evidence_role": {"type": "string", "minLength": 1},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "verified": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

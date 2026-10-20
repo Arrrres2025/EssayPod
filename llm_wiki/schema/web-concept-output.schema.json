@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Web-bootstrapped concept result",
+  "type": "object",
+  "required": ["title", "aliases", "summary", "facts", "connections", "caveats"],
+  "properties": {
+    "title": {"type": "string"},
+    "aliases": {"type": "array", "items": {"type": "string"}},
+    "summary": {"type": "string"},
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "source_ids"],
+        "properties": {
+          "text": {"type": "string"},
+          "source_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "connections": {"type": "array", "items": {"type": "string"}},
+    "caveats": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,6 @@
+Graph-Aware Retrieval for Persistent Knowledge Wikis
+
+Graph-aware retrieval combines lexical evidence with linked concept pages.
+Persistent knowledge wikis compile source documents before query time.
+Bidirectional links support multi-hop retrieval across related concepts.
+Graph-aware retrieval preserves provenance and exposes contradictory claims.

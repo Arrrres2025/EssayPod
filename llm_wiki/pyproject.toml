@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "karpathy-llm-wiki-mvp"
+version = "0.1.0"
+description = "A minimal runnable implementation of Karpathy's LLM Wiki pattern"
+requires-python = ">=3.11"
+dependencies = ["pypdf>=5.0"]
+
+[project.scripts]
+llm-wiki = "llm_wiki.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["llm_wiki*"]
+
+[tool.setuptools.package-data]
+llm_wiki = ["web/*"]
+

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wiki Page · LLM Wiki</title>
+  <meta name="description" content="Rendered Markdown page in the LLM Wiki.">
+  <link rel="stylesheet" href="/static/page.css">
+</head>
+<body>
+  <header class="page-header">
+    <a href="/graph" class="back">Knowledge Graph</a>
+    <div class="page-actions">
+      <span id="translationStatus" class="translation-status" aria-live="polite"></span>
+      <div class="language-switch" role="group" aria-label="页面语言">
+        <button type="button" class="language-button is-active" data-language="en" aria-pressed="true">English</button>
+        <button type="button" class="language-button" data-language="zh" aria-pressed="false">中文</button>
+      </div>
+      <a href="/" class="home">LLM Wiki</a>
+    </div>
+  </header>
+  <main class="page-shell">
+    <div id="pageMeta" class="page-meta" hidden></div>
+    <article id="pageContent" class="markdown-body" aria-live="polite">
+      <p class="loading">正在读取页面…</p>
+    </article>
+  </main>
+  <script type="module" src="/static/page.js"></script>
+</body>
+</html>

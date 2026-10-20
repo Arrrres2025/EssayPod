@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+data/*_config.json
+data/*_latest.json
+data/*_seen.json
+data/*.tmp
+!data/.gitkeep

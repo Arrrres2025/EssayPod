@@ -1,0 +1,176 @@
+:root {
+  color-scheme: light;
+  --bg: #fbfbfa;
+  --paper: #fff;
+  --text: #272a2e;
+  --muted: #858b91;
+  --line: #e8e9ea;
+  --link: #526f8d;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+}
+
+.page-header {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid rgba(232, 233, 234, .86);
+  background: rgba(251, 251, 250, .9);
+  backdrop-filter: blur(14px);
+}
+.page-header a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+}
+.back::before { content: "← "; }
+.page-header a:hover { color: var(--text); }
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border: 1px solid #dedfdf;
+  border-radius: 9px;
+  background: #f0f0ee;
+}
+.language-button {
+  min-width: 60px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 7px;
+  color: #85898e;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+.language-button:hover:not(:disabled) { color: #34383d; }
+.language-button.is-active {
+  color: #292d31;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(25, 28, 31, .1);
+}
+.language-button:disabled { cursor: progress; }
+.translation-status {
+  max-width: 240px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.translation-status.is-error { color: #ad4d4d; }
+
+.page-shell {
+  width: min(820px, calc(100% - 40px));
+  margin: 54px auto 100px;
+}
+.page-meta {
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.markdown-body {
+  padding: clamp(28px, 5vw, 58px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 14px 44px rgba(27, 31, 35, .045);
+}
+.markdown-body h1 {
+  margin: 0 0 30px;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 620;
+  letter-spacing: -.045em;
+  line-height: 1.08;
+}
+.markdown-body h2 {
+  margin: 44px 0 14px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 21px;
+  font-weight: 610;
+  letter-spacing: -.025em;
+}
+.markdown-body h3 { margin: 28px 0 10px; font-size: 16px; }
+.markdown-body p,
+.markdown-body li {
+  font-family: ui-serif, Georgia, "Songti SC", serif;
+  font-size: 16px;
+  line-height: 1.82;
+}
+.markdown-body p { margin: 12px 0; }
+.markdown-body ul,
+.markdown-body ol { padding-left: 24px; }
+.markdown-body li { margin: 7px 0; }
+.markdown-body blockquote {
+  margin: 24px 0;
+  padding: 13px 18px;
+  border-left: 3px solid #aab3bb;
+  color: #686f75;
+  background: #f8f9f9;
+  line-height: 1.65;
+}
+.markdown-body a {
+  color: var(--link);
+  text-decoration-color: #b9c6d1;
+  text-underline-offset: 3px;
+}
+.markdown-body a:hover { color: #294e72; }
+.wikilink {
+  padding: 1px 3px;
+  border-radius: 4px;
+  background: #eef3f7;
+  text-decoration: none;
+}
+.wikilink.missing {
+  color: #999;
+  background: #f1f1f1;
+  cursor: not-allowed;
+}
+code {
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #5c6268;
+  background: #f1f2f2;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: .84em;
+  overflow-wrap: anywhere;
+}
+pre {
+  overflow: auto;
+  padding: 18px;
+  border-radius: 9px;
+  background: #f4f5f5;
+}
+pre code { padding: 0; background: transparent; }
+.loading, .error { color: var(--muted); }
+
+@media (max-width: 620px) {
+  .page-header { padding: 14px 16px; }
+  .page-actions { gap: 8px; }
+  .home, .translation-status { display: none; }
+  .language-button { min-width: 54px; }
+  .page-shell { width: calc(100% - 20px); margin-top: 20px; }
+  .markdown-body { padding: 24px 20px; border-radius: 12px; }
+  .markdown-body p, .markdown-body li { font-size: 15px; }
+}

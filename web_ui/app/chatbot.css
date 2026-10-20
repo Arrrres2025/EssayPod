@@ -1,0 +1,79 @@
+.translation-card{position:relative;transition:padding .2s ease}
+.paper-chat-toggle{position:sticky;z-index:41;top:calc(100vh - 130px);float:left;clear:left;margin:18px 18px 0 0;height:42px;border:1px solid rgba(218,214,205,.9);border-radius:9px;background:#f0eee8;box-shadow:0 10px 30px rgba(31,28,42,.14);backdrop-filter:blur(14px);padding:0 13px;color:#4d3bd0;font-size:10px;font-weight:750;cursor:pointer;display:flex;align-items:center;gap:7px}
+.paper-chat-toggle span{width:20px;height:20px;border-radius:7px;display:grid;place-items:center;background:#eeeaff}
+.paper-chat-toggle:hover{background:#fff;transform:translateY(-1px)}
+.paper-chat-toggle.active{background:#eeeaff;color:#4d3bd0;border-color:#cfc6f5}
+.paper-chat-toggle.active span{background:#ddd5ff}
+.translation-reading-layout{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:28px}
+.translation-card.chat-expanded .translation-reading-layout{grid-template-columns:minmax(460px,1fr) minmax(0,1fr);align-items:stretch;gap:0;margin:0 -12px}
+.translation-document-pane{min-width:0}
+.translation-card.chat-expanded .translation-document-pane{padding-left:36px;animation:chatDocumentShift .42s cubic-bezier(.22,1,.36,1)}
+.translation-card.chat-expanded .translation-markdown{max-width:720px;margin-top:34px}
+.paper-chat-rail{min-height:760px;align-self:stretch}
+.paper-chat-panel{position:sticky;top:72px;height:calc(100vh - 154px);min-height:520px;margin-top:0;padding-right:28px;background:transparent;color:#2a2930;border-radius:0;border-right:1px solid #ddd9cf;overflow:clip;display:grid;grid-template-rows:76px minmax(0,1fr) 132px;box-shadow:none;animation:chatPanelReveal .42s cubic-bezier(.22,1,.36,1)}
+.paper-chat-panel>header{display:flex;align-items:center;padding:0 20px;border-bottom:1px solid #e4e0d8}
+.paper-chat-panel>header h3{font:700 20px Georgia,"Songti SC",serif;margin:5px 0 0;color:#201f25}
+.paper-chat-panel>header .section-kicker{color:#a99cff}
+.paper-chat-panel>header>i{width:8px;height:8px;border-radius:50%;background:#c4c0c8;margin-left:auto}
+.paper-chat-panel>header>i.ready{background:#c8f05a;box-shadow:0 0 0 5px rgba(200,240,90,.1)}
+.paper-chat-close{width:28px;height:28px;margin-left:12px;padding:0;border:0;background:transparent;color:#8c8791;font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:color .18s ease,transform .18s ease}
+.paper-chat-close:hover{color:#4d3bd0;transform:translateX(-3px)}
+.paper-chat-messages{overflow:auto;padding:22px 20px 32px;scrollbar-width:thin}
+.paper-chat-messages article{margin:0 0 15px}
+.paper-chat-messages article.user{display:flex;justify-content:flex-end}
+.paper-chat-messages article.user p{max-width:84%;margin:0;padding:11px 14px;border:1px solid #dcd6f2;border-radius:14px 14px 4px 14px;background:#f0edfa;color:#35313f;box-shadow:0 5px 16px rgba(64,52,104,.06);font-size:13px;line-height:1.7}
+.paper-chat-messages article.assistant{padding:0 5px}
+.chat-answer{font:14px/1.85 Georgia,"Songti SC",serif;color:#333139;overflow-wrap:anywhere}
+.chat-answer>:first-child{margin-top:0}
+.chat-answer>:last-child{margin-bottom:0}
+.chat-answer p{margin:0 0 10px}
+.chat-answer h1,.chat-answer h2,.chat-answer h3,.chat-answer h4{color:#201f25;font-family:Inter,"PingFang SC",sans-serif;line-height:1.4;margin:17px 0 8px}
+.chat-answer h1{font-size:21px}.chat-answer h2{font-size:19px}.chat-answer h3{font-size:17px}.chat-answer h4{font-size:15px}
+.chat-answer ul,.chat-answer ol{margin:7px 0 12px;padding-left:20px}
+.chat-answer li{margin:3px 0;padding-left:2px}
+.chat-answer li::marker{color:#a99cff}
+.chat-answer blockquote{margin:10px 0;padding:7px 11px;border-left:2px solid #8d7bf0;background:#f2effd;color:#5f5b68;border-radius:0 7px 7px 0}
+.chat-answer code{font:10px/1.55 "SFMono-Regular",Consolas,monospace;background:#efedf4;color:#4d3bd0;border-radius:4px;padding:2px 4px}
+.chat-answer pre{max-width:100%;overflow:auto;margin:10px 0;padding:10px 11px;background:#f4f2ed;border:1px solid #ded9d0;border-radius:8px}
+.chat-answer pre code{padding:0;background:transparent;color:#38353e}
+.chat-answer table{display:block;max-width:100%;overflow:auto;border-collapse:collapse;margin:11px 0;font:9px/1.55 Inter,"PingFang SC",sans-serif}
+.chat-answer th,.chat-answer td{border:1px solid #d9d5cc;padding:6px 8px;text-align:left;min-width:72px}
+.chat-answer th{background:#f0eee8;color:#27252c}.chat-answer tr:nth-child(even) td{background:#faf9f6}
+.chat-answer a{color:#4d3bd0;text-decoration:none;border-bottom:1px solid rgba(77,59,208,.28)}
+.chat-answer-image{margin:14px auto 16px;width:min(100%,520px);padding:0;border:0;background:transparent}
+.chat-answer-image img{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;border:1px solid #e2ded6;background:#fff;box-shadow:0 12px 34px rgba(31,28,42,.08)}
+.chat-answer-image figcaption{margin-top:7px;color:#7f7a86;font:9px/1.5 Inter,"PingFang SC",sans-serif;text-align:center}
+.chat-image-missing{display:inline-flex;align-items:center;max-width:100%;margin:3px 0;padding:4px 7px;border:1px solid #e1ddd5;border-radius:7px;background:#f7f5ef;color:#8a8490;font:9px/1.4 Inter,"PingFang SC",sans-serif}
+.chat-answer hr{border:0;border-top:1px solid #ddd9cf;margin:15px 0}
+.chat-answer .katex{font-size:1.02em;color:#26242b}
+.chat-answer .katex-display{max-width:100%;overflow-x:auto;overflow-y:hidden;margin:12px 0;padding:9px 7px;background:#f5f3ee;border-radius:8px}
+.chat-answer .katex-display>.katex{white-space:nowrap}
+.inline-citation{width:20px;height:20px;border:1px solid #d6d0ed;border-radius:6px;background:#f1eefb;color:#5945d5;box-shadow:0 2px 7px rgba(70,55,130,.06);font-size:9px;display:inline-grid;place-items:center;margin:0 3px;vertical-align:2px;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+.inline-citation:hover{background:#e5dffc;border-color:#b9acec;color:#4430bd;transform:translateY(-1px)}
+.chat-citation-row{display:flex;align-items:center;gap:4px;margin-top:12px;padding-top:9px;border-top:1px solid #e1ddd5;color:#8f8a98;font:8px/1.2 Inter,"PingFang SC",sans-serif}
+.paper-chat-empty{padding:34px 7px;color:#a7a3ad;text-align:center}
+.paper-chat-empty>b{display:block;color:#25232a;font:700 17px Georgia,"Songti SC",serif}
+.paper-chat-empty p{font-size:10px;line-height:1.7;margin:10px 5px 20px}
+.paper-chat-empty button{display:block;width:100%;border:1px solid #ddd9cf;background:#faf9f6;color:#67636d;border-radius:9px;padding:9px 10px;margin:7px 0;text-align:left;font-size:9px;cursor:pointer}
+.paper-chat-empty button:hover{border-color:#7464cf;color:#4d3bd0;background:#f2efff}
+.paper-chat-thinking{display:flex;align-items:flex-start;gap:8px;min-width:0;color:#8f8a96;font:9px/1.55 Inter,"PingFang SC",sans-serif;padding:5px}
+.paper-chat-thinking i{flex:0 0 auto;width:7px;height:7px;margin-top:3px;border-radius:50%;background:#c8f05a;animation:translationPulse 1s infinite}
+.paper-chat-thinking span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;animation:chatThinkingStep .28s ease}
+.paper-chat-error{border:1px solid #ecd4d7;background:#fff2f3;color:#a04f5a;border-radius:8px;padding:9px 10px;font-size:9px}
+.paper-chat-panel>footer{position:relative;z-index:3;border-top:1px solid #e4e0d8;padding:12px 14px 23px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);animation:chatComposerExpand .5s cubic-bezier(.22,1,.36,1)}
+.paper-chat-panel textarea{width:100%;height:88px;resize:none;border:1px solid #d8d4cb;border-radius:10px;background:#faf9f6;color:#26242b;outline:0;padding:12px 46px 12px 13px;font-size:13px;line-height:1.6}
+.paper-chat-panel textarea:focus{border-color:#7865ed;box-shadow:0 0 0 3px rgba(91,69,220,.15)}
+.paper-chat-panel textarea:disabled{opacity:.55}
+.paper-chat-panel>footer>button{position:absolute;right:22px;top:22px;width:28px;height:28px;border:0;border-radius:8px;background:#c8f05a;color:#242329;font-weight:800;cursor:pointer}
+.paper-chat-panel>footer>button:disabled{background:#e6e3dc;color:#a8a49c;cursor:not-allowed}
+.paper-chat-panel>footer small{position:absolute;left:16px;bottom:7px;color:#77747f;font-size:7px;max-width:85%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.paper-highlight{background:linear-gradient(100deg,rgba(200,240,90,.58),rgba(213,244,124,.28));color:inherit;border-radius:3px;padding:1px 2px;box-shadow:0 0 0 2px rgba(200,240,90,.12);animation:paperHighlightIn .7s ease}
+.citation-target{scroll-margin-top:110px}
+@keyframes paperHighlightIn{from{background:#b8aaff;box-shadow:0 0 0 10px rgba(91,69,220,.18)}}
+@keyframes chatPanelReveal{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes chatComposerExpand{from{opacity:.75;clip-path:inset(0 calc(100% - 96px) 0 0 round 10px)}to{opacity:1;clip-path:inset(0 0 0 0 round 10px)}}
+@keyframes chatDocumentShift{from{opacity:.82;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@keyframes chatThinkingStep{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.paper-chat-panel,.paper-chat-panel>footer,.translation-card.chat-expanded .translation-document-pane{animation:none}}
+@media(max-width:1050px){.translation-card.chat-expanded .translation-reading-layout{grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);gap:18px}.paper-chat-panel{top:65px}}
+@media(max-width:760px){.paper-chat-toggle{top:calc(100vh - 120px);height:38px}.translation-card.chat-expanded .translation-reading-layout{display:block;margin:0}.translation-card.chat-expanded .translation-document-pane{padding-left:0}.paper-chat-rail{height:auto;min-height:0}.paper-chat-panel{position:relative;top:auto;height:65vh;min-height:440px;margin:24px 0;padding-right:0;border-right:0;border-bottom:1px solid #ddd9cf}.translation-card.chat-expanded .translation-markdown{max-width:100%}}

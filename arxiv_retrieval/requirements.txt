@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+feedparser
+requests
+apscheduler
+python-multipart

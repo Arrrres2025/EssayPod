@@ -1,0 +1,10 @@
+websocket-client
+pypdf
+fastapi
+uvicorn
+python-multipart
+requests
+pymupdf
+fastembed
+numpy
+tiktoken

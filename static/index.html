@@ -1,0 +1,1591 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EssayPod</title>
+  <style>
+    :root {
+      --sidebar: #171717;
+      --sidebar-soft: #212121;
+      --main: #f7f7f8;
+      --panel: #ffffff;
+      --text: #202123;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #10a37f;
+      --accent-dark: #0e8f70;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--main);
+      height: 100vh;
+      overflow: hidden;
+    }
+    .app { display: flex; height: 100vh; }
+    .sidebar {
+      width: 285px;
+      background: var(--sidebar);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+    .brand {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 650;
+      padding: 0 8px;
+    }
+    .dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .new-task {
+      border: 1px solid #3a3a3a;
+      background: transparent;
+      color: white;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      margin: 8px 0 14px;
+      font-size: 14px;
+    }
+    .new-task:hover { background: var(--sidebar-soft); }
+    .task-list { overflow: auto; padding-right: 2px; }
+    .task-item {
+      padding: 11px 10px;
+      border-radius: 9px;
+      color: #e5e7eb;
+      cursor: pointer;
+      margin-bottom: 4px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .task-item:hover, .task-item.active { background: var(--sidebar-soft); }
+    .task-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .task-status {
+      color: #a3a3a3;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .topbar {
+      height: 58px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-weight: 650;
+    }
+    .content {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 34px 24px 40px;
+    }
+    .panel {
+      width: min(860px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+      padding: 28px 28px 36px;
+      min-height: calc(100vh - 58px - 74px);
+      height: auto;
+      flex: 0 0 auto;
+      box-sizing: border-box;
+    }
+    .empty {
+      min-height: calc(100vh - 58px - 74px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--muted);
+    }
+    h1 { font-size: 28px; margin: 0 0 10px; }
+    h2 { font-size: 20px; margin: 0 0 16px; }
+    p { color: var(--muted); line-height: 1.7; }
+    .upload-box {
+      border: 2px dashed #d1d5db;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      background: #fafafa;
+      margin-top: 24px;
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    }
+    .upload-box:hover {
+      border-color: var(--accent);
+      background: #f9fffd;
+    }
+    .upload-box.dragover {
+      border-color: var(--accent);
+      background: #ecfdf5;
+      transform: translateY(-1px);
+    }
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .file-name {
+      color: #374151;
+      font-size: 13px;
+      margin: 8px 0 14px;
+      min-height: 18px;
+    }
+    .upload-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      background: #ecfdf5;
+      color: var(--accent-dark);
+      font-weight: 800;
+      font-size: 22px;
+    }
+    .upload-title {
+      margin: 0;
+      color: #111827;
+      font-weight: 700;
+    }
+    .upload-subtitle {
+      margin: 8px 0 10px;
+      color: var(--muted);
+    }
+    .intake-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 18px 0 14px;
+    }
+    .intake-tab {
+      border: 1px solid var(--line);
+      background: white;
+      color: #374151;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .intake-tab.active {
+      border-color: var(--accent);
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .intake-panel { display: none; text-align: left; }
+    .intake-panel.active { display: block; }
+    .url-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      margin: 8px 0 12px;
+      font-family: inherit;
+    }
+    .url-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.12);
+    }
+    .url-hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .level-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+      text-align: left;
+    }
+    .level-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .level-card {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: white;
+      cursor: pointer;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .level-card strong {
+      display: block;
+      color: #111827;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .level-card span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .level-option input:checked + .level-card {
+      border-color: var(--accent);
+      background: #ecfdf5;
+      box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.12);
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 14px;
+    }
+    button:hover { background: var(--accent-dark); }
+    button.secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid var(--line);
+    }
+    button.secondary:hover { background: #e5e7eb; }
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 12px 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .badge {
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #047857;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .badge.generating { background: #eff6ff; color: #1d4ed8; }
+    .badge.failed { background: #fef2f2; color: var(--danger); }
+    audio {
+      width: 100%;
+      margin-top: 18px;
+    }
+    video {
+      width: 100%;
+      margin-top: 14px;
+      border-radius: 12px;
+      background: #111827;
+      max-height: 420px;
+    }
+    .format-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 14px 0 16px;
+    }
+    .format-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .format-card {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: white;
+      cursor: pointer;
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .format-card strong {
+      display: block;
+      color: #111827;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .format-card span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .format-option input:checked + .format-card {
+      border-color: var(--accent);
+      background: #ecfdf5;
+      box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.12);
+    }
+    .video-status {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .layout-editor-block {
+      margin: 16px 0 18px;
+    }
+    .layout-editor-block h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #111827;
+    }
+    .layout-editor-block p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .layout-canvas-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f9fafb;
+      padding: 12px;
+    }
+    .layout-canvas {
+      position: relative;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin: 0 auto;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.03);
+      user-select: none;
+    }
+    .layout-region {
+      position: absolute;
+      border: 2px solid rgba(16, 163, 127, .75);
+      border-radius: 8px;
+      background: rgba(236, 253, 245, .72);
+      overflow: hidden;
+      box-sizing: border-box;
+      min-width: 40px;
+      min-height: 32px;
+    }
+    .layout-region[data-region="page"] {
+      border-color: rgba(107, 114, 128, .75);
+      background: rgba(249, 250, 251, .88);
+      z-index: 1;
+    }
+    .layout-region[data-region="figures"] {
+      border-color: rgba(234, 88, 12, .75);
+      background: rgba(255, 247, 237, .78);
+      z-index: 2;
+    }
+    .layout-region[data-region="key_points"] {
+      border-color: rgba(16, 163, 127, .75);
+      background: rgba(236, 253, 245, .72);
+      z-index: 3;
+    }
+    .layout-region[data-region="title"] {
+      border-color: rgba(37, 99, 235, .75);
+      background: rgba(239, 246, 255, .78);
+      z-index: 4;
+    }
+    .layout-region-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #374151;
+      background: rgba(255,255,255,.72);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      cursor: move;
+    }
+    .layout-region-body {
+      position: absolute;
+      inset: 24px 6px 6px 6px;
+      overflow: hidden;
+      pointer-events: none;
+      font-size: 10px;
+      line-height: 1.35;
+      color: #4b5563;
+    }
+    .layout-region-body img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .layout-region-body .kp-item {
+      margin-bottom: 4px;
+    }
+    .layout-region-body .kp-item strong {
+      display: block;
+      font-size: 10px;
+      color: #111827;
+    }
+    .layout-resize-handle {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 14px;
+      height: 14px;
+      cursor: nwse-resize;
+      background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,.25) 50%);
+      border-bottom-right-radius: 6px;
+    }
+    .layout-save-hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .live-hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .section {
+      border-top: 1px solid var(--line);
+      margin-top: 24px;
+      padding-top: 20px;
+    }
+    pre {
+      background: #f6f6f6;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow: auto;
+      color: #374151;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .key-info-scroll {
+      max-height: min(520px, calc(100vh - 420px));
+      min-height: 180px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fafc;
+      -webkit-overflow-scrolling: touch;
+    }
+    .key-info-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+    .key-info-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    .key-info-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .key-info {
+      padding: 16px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      box-sizing: border-box;
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 78px;
+    }
+    .stream-cursor::after {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 1em;
+      margin-left: 2px;
+      vertical-align: -0.15em;
+      background: var(--accent);
+      animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    .error { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="dot">E</div><span>EssayPod</span></div>
+      <button class="new-task" id="newTaskBtn">＋ 新建任务</button>
+      <div class="task-list" id="taskList"></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div id="topTitle">论文播客播放器</div>
+        <div style="color:#6b7280;font-size:13px;">PDF → 浓缩讲解稿 → 双人播客 → 讲解视频</div>
+      </div>
+      <div class="content">
+        <div class="panel" id="panel"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let tasks = [];
+    let selectedId = null;
+    let pollTimer = null;
+    let renderedTaskId = null;
+    let lastVideoUiState = null;
+    let livePlayer = null;
+    const streamedKeyInfoTaskIds = new Set();
+    const keyInfoTimers = new Map();
+    const NEW_TASK_ID = "__new_task__";
+    const STREAM_MIME = "audio/mpeg";
+    const LIVE_BUFFER_SECONDS = 5;
+    const LIVE_EDGE_THRESHOLD_SECONDS = 6;
+
+    const statusText = {
+      uploaded: "已上传",
+      generating: "生成中",
+      pausing: "暂停中",
+      paused: "已暂停",
+      ready: "可收听",
+      failed: "失败",
+    };
+    const videoStatusText = {
+      idle: "未制作",
+      generating: "生成中",
+      ready: "已完成",
+      failed: "失败",
+    };
+    const LAYOUT_CANVAS = { width: 1920, height: 1080 };
+    const LAYOUT_REGION_ORDER = ["page", "figures", "key_points", "title"];
+    const LAYOUT_REGION_LABELS = {
+      title: "标题",
+      key_points: "板书",
+      page: "PDF 页面",
+      figures: "图表",
+    };
+    const LAYOUT_MIN_SIZE = 80;
+    let layoutEditorState = {
+      taskId: null,
+      layout: null,
+      preview: null,
+      scale: 0.5,
+      dirty: false,
+    };
+    let layoutDragState = null;
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, options);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || response.statusText);
+      }
+      return response.json();
+    }
+
+    async function refreshTasks() {
+      tasks = await api("/api/tasks");
+      if (!selectedId && tasks.length) selectedId = tasks[0].id;
+      renderSidebar();
+      const task = selectedTask();
+      if (task && renderedTaskId === task.id) {
+        updatePanel(task);
+      } else if (!task && selectedId === NEW_TASK_ID && renderedTaskId === NEW_TASK_ID) {
+        // Keep the selected File object alive; re-rendering resets <input type="file">.
+        return;
+      } else {
+        renderPanel();
+      }
+    }
+
+    function renderSidebar() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      for (const task of tasks) {
+        const item = document.createElement("div");
+        item.className = "task-item" + (task.id === selectedId ? " active" : "");
+        item.onclick = () => { selectedId = task.id; renderSidebar(); renderPanel(); };
+        item.innerHTML = `
+          <div class="task-title">${escapeHtml(displayTitle(task))}</div>
+          <div class="task-status">${statusText[task.status] || task.status}</div>
+        `;
+        list.appendChild(item);
+      }
+    }
+
+    function selectedTask() {
+      if (selectedId === NEW_TASK_ID) return null;
+      return tasks.find(t => t.id === selectedId);
+    }
+
+    function renderPanel() {
+      const panel = document.getElementById("panel");
+      const task = selectedTask();
+      if (livePlayer && livePlayer.taskId !== (task && task.id)) stopLivePlayer();
+      if (!task) {
+        renderedTaskId = selectedId === NEW_TASK_ID ? NEW_TASK_ID : null;
+        panel.innerHTML = `
+          <div class="empty">
+            <div>
+              <h1>上传或链接 PDF，生成可播放的论文播客</h1>
+              <p>支持本地 PDF 上传，或直接粘贴 arXiv 等论文 PDF 链接。</p>
+              ${uploadBoxHtml()}
+            </div>
+          </div>
+        `;
+        bindUpload();
+        return;
+      }
+
+      renderedTaskId = task.id;
+      lastVideoUiState = null;
+      const badgeClass = task.status === "generating" || task.status === "pausing" || task.status === "paused" ? "generating" : task.status === "failed" ? "failed" : "";
+      panel.innerHTML = `
+        <h1 id="taskTitle">${escapeHtml(displayTitle(task))}</h1>
+        <div class="meta">
+          <span class="badge ${badgeClass}" id="statusBadge">${statusText[task.status] || task.status}</span>
+          <span>${escapeHtml(task.filename || "")}</span>
+          <span id="levelText">${levelText(task.condense_level)}</span>
+          ${task.source_url ? `<span><a href="${safeExternalUrl(task.source_url)}" target="_blank" rel="noopener">来源链接</a></span>` : ""}
+        </div>
+        <div class="row">
+          <button id="listenBtn" ${task.status === "generating" || task.status === "pausing" ? "disabled" : ""}>${primaryActionText(task)}</button>
+          <button class="secondary" id="pauseGenerateBtn" style="${task.status === "generating" ? "" : "display:none"}">暂停生成</button>
+          ${task.pdf_ready ? `<button class="secondary" id="viewPdfBtn">查看原论文</button>` : ""}
+          <button class="secondary" id="refreshBtn">刷新状态</button>
+          <button class="secondary" id="uploadAnotherBtn">上传新的 PDF</button>
+        </div>
+        <p class="error" id="errorText" style="${task.error ? "" : "display:none"}">${escapeHtml(task.error || "")}</p>
+        <div id="playerSlot">${playerHtml(task)}</div>
+        <div id="videoSlot">${videoSectionHtml(task)}</div>
+        <div id="inlineUpload" style="display:none">${uploadBoxHtml()}</div>
+        <div id="keyInfoSlot">${keyInfoHtml(task)}</div>
+      `;
+      document.getElementById("listenBtn").onclick = () => startGeneration(task.id);
+      document.getElementById("pauseGenerateBtn").onclick = () => pauseGeneration(task.id);
+      const viewPdfBtn = document.getElementById("viewPdfBtn");
+      if (viewPdfBtn) {
+        viewPdfBtn.onclick = () => window.open(`/api/tasks/${task.id}/pdf`, "_blank", "noopener");
+      }
+      document.getElementById("refreshBtn").onclick = refreshOne;
+      document.getElementById("uploadAnotherBtn").onclick = () => {
+        const box = document.getElementById("inlineUpload");
+        box.style.display = box.style.display === "none" ? "block" : "none";
+        bindUpload(box);
+      };
+      setupLivePlayerIfNeeded(task);
+      setupKeyInfoStream(task);
+      bindVideoControls(task);
+    }
+
+    function updatePanel(task) {
+      const taskTitle = document.getElementById("taskTitle");
+      if (taskTitle) {
+        taskTitle.textContent = displayTitle(task);
+      }
+      const badge = document.getElementById("statusBadge");
+      if (badge) {
+        badge.className = "badge " + (task.status === "generating" || task.status === "pausing" || task.status === "paused" ? "generating" : task.status === "failed" ? "failed" : "");
+        badge.textContent = statusText[task.status] || task.status;
+      }
+      const levelNode = document.getElementById("levelText");
+      if (levelNode) {
+        levelNode.textContent = levelText(task.condense_level);
+      }
+      const listenBtn = document.getElementById("listenBtn");
+      if (listenBtn) {
+        listenBtn.disabled = task.status === "generating" || task.status === "pausing";
+        listenBtn.textContent = primaryActionText(task);
+      }
+      const pauseGenerateBtn = document.getElementById("pauseGenerateBtn");
+      if (pauseGenerateBtn) {
+        pauseGenerateBtn.style.display = task.status === "generating" ? "" : "none";
+      }
+      const errorText = document.getElementById("errorText");
+      if (errorText) {
+        errorText.textContent = task.error || "";
+        errorText.style.display = task.error ? "" : "none";
+      }
+      const keyInfoSlot = document.getElementById("keyInfoSlot");
+      const keyInfoText = document.getElementById("keyInfoText");
+      if (keyInfoSlot && (!keyInfoText || keyInfoText.dataset.ready !== String(Boolean(task.condensed_key_info)))) {
+        keyInfoSlot.innerHTML = keyInfoHtml(task);
+        setupKeyInfoStream(task);
+      } else {
+        setupKeyInfoStream(task);
+      }
+      const playerSlot = document.getElementById("playerSlot");
+      const player = document.getElementById("player");
+      if (playerSlot && !player && (task.audio_ready || task.partial_ready || task.status === "generating")) {
+        playerSlot.innerHTML = playerHtml(task);
+        setupLivePlayerIfNeeded(task);
+      } else {
+        setupLivePlayerIfNeeded(task);
+      }
+      const videoSlot = document.getElementById("videoSlot");
+      if (videoSlot) {
+        updateVideoSection(task, { force: false });
+      }
+    }
+
+    function videoUiSignature(task, format) {
+      const state = videoState(task, format);
+      const landscape = videoState(task, "16:9");
+      const portrait = videoState(task, "9:16");
+      return [
+        format,
+        state.status,
+        state.ready,
+        state.error || "",
+        landscape.status,
+        portrait.status,
+      ].join("|");
+    }
+
+    function updateVideoSection(task, { force = false } = {}) {
+      const videoSlot = document.getElementById("videoSlot");
+      if (!task.audio_ready) {
+        if (videoSlot) videoSlot.innerHTML = "";
+        lastVideoUiState = null;
+        return;
+      }
+      if (!videoSlot) return;
+
+      if (!document.getElementById("videoSection")) {
+        videoSlot.innerHTML = videoSectionHtml(task);
+        bindVideoControls(task);
+        lastVideoUiState = videoUiSignature(task, selectedVideoFormat());
+        return;
+      }
+
+      const format = selectedVideoFormat();
+      const signature = videoUiSignature(task, format);
+      if (!force && signature === lastVideoUiState) return;
+
+      const previousSignature = lastVideoUiState;
+      lastVideoUiState = signature;
+
+      const state = videoState(task, format);
+      const landscape = videoState(task, "16:9");
+      const portrait = videoState(task, "9:16");
+      const statusLine = document.getElementById("videoStatusLine");
+      const generateBtn = document.getElementById("generateVideoBtn");
+      const downloadBtn = document.getElementById("downloadVideoBtn");
+      const errorText = document.getElementById("videoErrorText");
+      const previewSlot = document.getElementById("videoPreviewSlot");
+      const videoPreview = document.getElementById("videoPreview");
+
+      if (statusLine) {
+        statusLine.textContent =
+          `横屏：${videoStatusText[landscape.status] || landscape.status} · 竖屏：${videoStatusText[portrait.status] || portrait.status}`;
+      }
+      if (generateBtn) {
+        generateBtn.disabled = state.status === "generating";
+        generateBtn.textContent = state.ready ? "重新制作视频" : "开始制作视频";
+      }
+      if (downloadBtn) {
+        downloadBtn.style.display = state.ready ? "" : "none";
+      }
+      if (errorText) {
+        errorText.textContent = state.error || "";
+        errorText.style.display = state.error ? "" : "none";
+      }
+      if (!previewSlot) return;
+
+      if (state.ready) {
+        const previousReady = previousSignature && previousSignature.split("|")[2] === "true";
+        const sameFormat = previousSignature && previousSignature.split("|")[0] === format;
+        if (videoPreview && previousReady && sameFormat && !force) {
+          return;
+        }
+        if (videoPreview && videoPreview.dataset.format === format && !force) {
+          return;
+        }
+        previewSlot.innerHTML =
+          `<video id="videoPreview" controls preload="metadata" data-format="${format}" src="/api/tasks/${task.id}/video?video_format=${encodeURIComponent(format)}"></video>`;
+        return;
+      }
+
+      const hintText = state.status === "generating"
+        ? "视频正在生成，请稍候..."
+        : "选择横屏或竖屏后点击“开始制作视频”。";
+      const hint = document.getElementById("videoHint");
+      if (hint) {
+        hint.textContent = hintText;
+        return;
+      }
+      previewSlot.innerHTML = `<p class="video-status" id="videoHint">${hintText}</p>`;
+    }
+
+    function displayTitle(task) {
+      return task.display_title || task.title || "Untitled PDF";
+    }
+
+    function levelText(level) {
+      const labels = {
+        low: "低档：1100-1500 字",
+        mid: "中档：2200-3000 字",
+        high: "高档：全文输入",
+      };
+      return labels[level] || labels.mid;
+    }
+
+    function primaryActionText(task) {
+      if (task.status === "paused") return task.checkpoint_ready ? "继续生成" : "重新开始生成";
+      if (task.audio_ready) return "重新生成";
+      if (task.partial_ready) return "继续生成";
+      return "收听";
+    }
+
+    function playerHtml(task) {
+      if (task.audio_ready) {
+        return `<audio id="player" controls src="/api/tasks/${task.id}/audio"></audio>`;
+      }
+      if (task.partial_ready || task.status === "generating") {
+        if (!supportsLivePlayer()) {
+          return `<audio id="player" controls src="/api/tasks/${task.id}/audio"></audio><div class="live-hint">当前浏览器不支持直播式 MediaSource 播放，已使用普通播放器。</div>`;
+        }
+        return `<audio id="player" controls></audio><div class="live-hint" id="liveHint">等待流式音频输出...</div>`;
+      }
+      return `<p>点击“收听”后开始生成。完成后播放器会出现在这里；生成中也会持续保存 partial 文件。</p>`;
+    }
+
+    function selectedVideoFormat() {
+      const checked = document.querySelector("input[name='videoFormat']:checked");
+      return checked ? checked.value : "16:9";
+    }
+
+    function videoState(task, format) {
+      return (task.video && task.video[format]) || { status: "idle", ready: false, error: "" };
+    }
+
+    function taskHasGeneratingVideo(task) {
+      if (!task.video) return false;
+      return Object.values(task.video).some(item => item.status === "generating");
+    }
+
+    function videoSectionHtml(task) {
+      if (!task.audio_ready) return "";
+
+      const landscape = videoState(task, "16:9");
+      const portrait = videoState(task, "9:16");
+      const defaultFormat = landscape.ready ? "16:9" : portrait.ready ? "9:16" : "16:9";
+      const current = videoState(task, defaultFormat);
+      const previewHtml = current.ready
+        ? `<video id="videoPreview" controls preload="metadata" data-format="${defaultFormat}" src="/api/tasks/${task.id}/video?video_format=${encodeURIComponent(defaultFormat)}"></video>`
+        : `<p class="video-status" id="videoHint">${current.status === "generating" ? "视频正在生成，请稍候..." : "选择横屏或竖屏后点击“开始制作视频”。"}</p>`;
+
+      return `
+        <div class="section" id="videoSection">
+          <h2>讲解视频</h2>
+          <p>播客完成后，可将 PDF 翻页、字幕与板书合成为讲解视频。</p>
+          <div class="format-group" role="radiogroup" aria-label="视频画幅">
+            <label class="format-option">
+              <input type="radio" name="videoFormat" value="16:9" ${defaultFormat === "16:9" ? "checked" : ""} />
+              <span class="format-card"><strong>横屏 16:9</strong><span>适合电脑与投影播放，支持自定义布局。</span></span>
+            </label>
+            <label class="format-option">
+              <input type="radio" name="videoFormat" value="9:16" ${defaultFormat === "9:16" ? "checked" : ""} />
+              <span class="format-card"><strong>竖屏 9:16</strong><span>适合手机短视频平台。</span></span>
+            </label>
+          </div>
+          <div class="layout-editor-block" id="layoutEditorWrap" style="${defaultFormat === "16:9" ? "" : "display:none"}">
+            <h3>画面布局</h3>
+            <p>拖动或缩放四个区域，自定义标题、板书、PDF 与图表位置。内容会在各自区域内自适应，底部字幕保持居中不变。</p>
+            <div class="layout-canvas-wrap">
+              <div class="layout-canvas" id="layoutCanvas"></div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <button class="secondary" type="button" id="resetLayoutBtn">恢复默认布局</button>
+              <span class="layout-save-hint" id="layoutSaveHint"></span>
+            </div>
+          </div>
+          <div class="row">
+            <button id="generateVideoBtn" ${current.status === "generating" ? "disabled" : ""}>${current.ready ? "重新制作视频" : "开始制作视频"}</button>
+            <button class="secondary" id="downloadVideoBtn" style="${current.ready ? "" : "display:none"}">下载视频</button>
+          </div>
+          <div class="video-status" id="videoStatusLine">
+            横屏：${videoStatusText[landscape.status] || landscape.status}
+            · 竖屏：${videoStatusText[portrait.status] || portrait.status}
+          </div>
+          <p class="error" id="videoErrorText" style="${current.error ? "" : "display:none"}">${escapeHtml(current.error || "")}</p>
+          <div id="videoPreviewSlot">${previewHtml}</div>
+        </div>
+      `;
+    }
+
+    function bindVideoControls(task) {
+      const generateBtn = document.getElementById("generateVideoBtn");
+      const downloadBtn = document.getElementById("downloadVideoBtn");
+      const formatInputs = document.querySelectorAll("input[name='videoFormat']");
+      const resetLayoutBtn = document.getElementById("resetLayoutBtn");
+      if (!generateBtn) return;
+
+      formatInputs.forEach(input => {
+        input.onchange = () => {
+          toggleLayoutEditorVisibility();
+          const current = selectedTask();
+          if (current) refreshVideoPreview(current);
+        };
+      });
+      generateBtn.onclick = () => startVideoGeneration(task.id);
+      if (downloadBtn) {
+        downloadBtn.onclick = () => {
+          const format = selectedVideoFormat();
+          window.location.href = `/api/tasks/${task.id}/video?video_format=${encodeURIComponent(format)}&download=1`;
+        };
+      }
+      if (resetLayoutBtn) {
+        resetLayoutBtn.onclick = () => resetLayout(task.id);
+      }
+      initLayoutEditor(task);
+      bindLayoutPointerHandlers();
+    }
+
+    function toggleLayoutEditorVisibility() {
+      const wrap = document.getElementById("layoutEditorWrap");
+      if (!wrap) return;
+      wrap.style.display = selectedVideoFormat() === "16:9" ? "" : "none";
+    }
+
+    function setLayoutSaveHint(text) {
+      const hint = document.getElementById("layoutSaveHint");
+      if (hint) hint.textContent = text || "";
+    }
+
+    async function initLayoutEditor(task, { force = false } = {}) {
+      if (selectedVideoFormat() !== "16:9") return;
+      if (!force && layoutEditorState.taskId === task.id && layoutEditorState.layout) {
+        renderLayoutCanvas();
+        return;
+      }
+      try {
+        const data = await api(`/api/tasks/${task.id}/video/layout?video_format=16%3A9`);
+        layoutEditorState = {
+          taskId: task.id,
+          layout: data.layout,
+          preview: data.preview || {},
+          scale: 0.5,
+          dirty: false,
+        };
+        renderLayoutCanvas();
+        setLayoutSaveHint("布局已加载");
+      } catch (error) {
+        setLayoutSaveHint(`布局加载失败：${error.message}`);
+      }
+    }
+
+    function layoutRegion(name) {
+      return layoutEditorState.layout?.regions?.[name];
+    }
+
+    function clampRegion(region) {
+      const min = LAYOUT_MIN_SIZE;
+      region.x = Math.max(0, Math.min(region.x, LAYOUT_CANVAS.width - min));
+      region.y = Math.max(0, Math.min(region.y, LAYOUT_CANVAS.height - min));
+      region.w = Math.max(min, Math.min(region.w, LAYOUT_CANVAS.width - region.x));
+      region.h = Math.max(min, Math.min(region.h, LAYOUT_CANVAS.height - region.y));
+      region.w = region.w - (region.w % 2);
+      region.h = region.h - (region.h % 2);
+      return region;
+    }
+
+    function regionPreviewHtml(name, region) {
+      const preview = layoutEditorState.preview || {};
+      if (name === "title") {
+        const title = preview.title || "论文主标题预览";
+        return `<div>${escapeHtml(title)}</div>`;
+      }
+      if (name === "key_points") {
+        const items = preview.key_points || [];
+        if (!items.length) {
+          return `<div>▸ 记忆锚点标题<br>补充说明文字</div>`;
+        }
+        return items.map(item => (
+          `<div class="kp-item"><strong>▸ ${escapeHtml(item.title || "")}</strong>${escapeHtml(item.detail || "")}</div>`
+        )).join("");
+      }
+      if (name === "page") {
+        if (preview.page_url) {
+          return `<img src="${preview.page_url}" alt="PDF preview" />`;
+        }
+        return `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9ca3af">PDF 页面</div>`;
+      }
+      if (name === "figures") {
+        const urls = preview.figure_urls || [];
+        if (!urls.length) {
+          return `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9ca3af">Figure 图表</div>`;
+        }
+        return urls.map(url => `<img src="${url}" alt="figure preview" />`).join("");
+      }
+      return "";
+    }
+
+    function renderLayoutCanvas() {
+      const canvas = document.getElementById("layoutCanvas");
+      if (!canvas || !layoutEditorState.layout) return;
+      const scale = layoutEditorState.scale;
+      canvas.style.width = `${Math.round(LAYOUT_CANVAS.width * scale)}px`;
+      canvas.style.height = `${Math.round(LAYOUT_CANVAS.height * scale)}px`;
+      canvas.innerHTML = LAYOUT_REGION_ORDER.map(name => {
+        const region = layoutRegion(name);
+        if (!region) return "";
+        const left = Math.round(region.x * scale);
+        const top = Math.round(region.y * scale);
+        const width = Math.round(region.w * scale);
+        const height = Math.round(region.h * scale);
+        return `
+          <div class="layout-region" data-region="${name}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px">
+            <div class="layout-region-header">${LAYOUT_REGION_LABELS[name]}</div>
+            <div class="layout-region-body">${regionPreviewHtml(name, region)}</div>
+            <div class="layout-resize-handle" data-resize="${name}"></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function bindLayoutPointerHandlers() {
+      if (window.__layoutPointerBound) return;
+      window.__layoutPointerBound = true;
+
+      document.addEventListener("mousedown", event => {
+        const canvas = document.getElementById("layoutCanvas");
+        if (!canvas || !layoutEditorState.layout) return;
+        const resizeHandle = event.target.closest(".layout-resize-handle");
+        const header = event.target.closest(".layout-region-header");
+        if (!resizeHandle && !header) return;
+        event.preventDefault();
+        const regionName = resizeHandle?.dataset.resize || header.closest(".layout-region")?.dataset.region;
+        if (!regionName) return;
+        const region = layoutRegion(regionName);
+        if (!region) return;
+        const rect = canvas.getBoundingClientRect();
+        layoutDragState = {
+          mode: resizeHandle ? "resize" : "move",
+          regionName,
+          startX: event.clientX,
+          startY: event.clientY,
+          origin: { ...region },
+          canvasRect: rect,
+          scale: layoutEditorState.scale,
+        };
+      });
+
+      document.addEventListener("mousemove", event => {
+        if (!layoutDragState) return;
+        const region = layoutRegion(layoutDragState.regionName);
+        if (!region) return;
+        const dx = Math.round((event.clientX - layoutDragState.startX) / layoutDragState.scale);
+        const dy = Math.round((event.clientY - layoutDragState.startY) / layoutDragState.scale);
+        const origin = layoutDragState.origin;
+        if (layoutDragState.mode === "move") {
+          region.x = origin.x + dx;
+          region.y = origin.y + dy;
+        } else {
+          region.w = origin.w + dx;
+          region.h = origin.h + dy;
+        }
+        clampRegion(region);
+        renderLayoutCanvas();
+        layoutEditorState.dirty = true;
+        setLayoutSaveHint("调整中…");
+      });
+
+      document.addEventListener("mouseup", async () => {
+        if (!layoutDragState) return;
+        layoutDragState = null;
+        if (!layoutEditorState.dirty || !layoutEditorState.taskId) return;
+        await saveLayout(layoutEditorState.taskId);
+      });
+    }
+
+    async function saveLayout(taskId) {
+      if (!layoutEditorState.layout) return;
+      try {
+        await api(`/api/tasks/${taskId}/video/layout`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            video_format: "16:9",
+            layout: layoutEditorState.layout,
+          }),
+        });
+        layoutEditorState.dirty = false;
+        setLayoutSaveHint("布局已保存");
+      } catch (error) {
+        setLayoutSaveHint(`保存失败：${error.message}`);
+      }
+    }
+
+    async function resetLayout(taskId) {
+      try {
+        const form = new FormData();
+        form.append("video_format", "16:9");
+        const data = await api(`/api/tasks/${taskId}/video/layout/reset`, { method: "POST", body: form });
+        layoutEditorState.layout = data.layout;
+        layoutEditorState.dirty = false;
+        renderLayoutCanvas();
+        setLayoutSaveHint("已恢复默认布局");
+      } catch (error) {
+        setLayoutSaveHint(`恢复失败：${error.message}`);
+      }
+    }
+
+    function refreshVideoPreview(task) {
+      lastVideoUiState = null;
+      updateVideoSection(task, { force: true });
+    }
+
+    async function startVideoGeneration(taskId) {
+      const format = selectedVideoFormat();
+      if (format === "16:9" && layoutEditorState.dirty) {
+        await saveLayout(taskId);
+      }
+      const form = new FormData();
+      form.append("video_format", format);
+      await api(`/api/tasks/${taskId}/video/generate`, { method: "POST", body: form });
+      lastVideoUiState = null;
+      await refreshTasks();
+      startPolling();
+    }
+
+    function keyInfoHtml(task) {
+      if (task.condensed_key_info) {
+        return `
+          <div class="section">
+            <h2>关键信息核对</h2>
+            <div class="key-info-scroll">
+              <div class="key-info" id="keyInfoText" data-ready="true"></div>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="section">
+          <h2>关键信息核对</h2>
+          <div class="key-info-scroll">
+            <div class="key-info" id="keyInfoText" data-ready="false">浓缩完成后，这里会展示论文的研究问题、核心方法、关键实验结论和局限。</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setupKeyInfoStream(task) {
+      const target = document.getElementById("keyInfoText");
+      if (!target || !task.condensed_key_info) return;
+      const text = task.condensed_key_info;
+      if (streamedKeyInfoTaskIds.has(task.id)) {
+        target.textContent = text;
+        target.classList.remove("stream-cursor");
+        return;
+      }
+      if (keyInfoTimers.has(task.id)) return;
+
+      target.textContent = "";
+      target.classList.add("stream-cursor");
+      let index = 0;
+      const timer = setInterval(() => {
+        index += 2;
+        target.textContent = text.slice(0, index);
+        if (index >= text.length) {
+          clearInterval(timer);
+          keyInfoTimers.delete(task.id);
+          streamedKeyInfoTaskIds.add(task.id);
+          target.classList.remove("stream-cursor");
+        }
+      }, 18);
+      keyInfoTimers.set(task.id, timer);
+    }
+
+    function supportsLivePlayer() {
+      return window.MediaSource && MediaSource.isTypeSupported(STREAM_MIME);
+    }
+
+    function setupLivePlayerIfNeeded(task) {
+      if (!task || task.audio_ready || !(task.partial_ready || task.status === "generating") || !supportsLivePlayer()) return;
+      if (livePlayer && livePlayer.taskId === task.id) return;
+      stopLivePlayer();
+
+      const audio = document.getElementById("player");
+      if (!audio) return;
+      const mediaSource = new MediaSource();
+      const objectUrl = URL.createObjectURL(mediaSource);
+      const state = {
+        taskId: task.id,
+        audio,
+        mediaSource,
+        sourceBuffer: null,
+        objectUrl,
+        offset: 0,
+        queue: [],
+        fetching: false,
+        ended: false,
+        followLive: true,
+        timer: null,
+      };
+      livePlayer = state;
+      audio.src = objectUrl;
+      audio.addEventListener("seeking", () => {
+        state.followLive = isNearLiveEdge(audio);
+      });
+      audio.addEventListener("timeupdate", () => {
+        if (isNearLiveEdge(audio)) state.followLive = true;
+      });
+      mediaSource.addEventListener("sourceopen", () => {
+        state.sourceBuffer = mediaSource.addSourceBuffer(STREAM_MIME);
+        state.sourceBuffer.mode = "sequence";
+        state.sourceBuffer.addEventListener("updateend", () => appendQueuedChunks(state));
+        fetchLiveChunk(state);
+        state.timer = setInterval(() => fetchLiveChunk(state), 900);
+      }, { once: true });
+    }
+
+    function stopLivePlayer() {
+      if (!livePlayer) return;
+      if (livePlayer.timer) clearInterval(livePlayer.timer);
+      if (livePlayer.objectUrl) URL.revokeObjectURL(livePlayer.objectUrl);
+      livePlayer = null;
+    }
+
+    async function fetchLiveChunk(state) {
+      if (state.fetching || state.ended || !state.sourceBuffer) return;
+      state.fetching = true;
+      try {
+        const response = await fetch(`/api/tasks/${state.taskId}/audio-chunk?offset=${state.offset}`, { cache: "no-store" });
+        const nextOffset = Number(response.headers.get("X-Next-Offset") || state.offset);
+        const complete = response.headers.get("X-Audio-Complete") === "true";
+        if (response.status !== 204) {
+          const chunk = await response.arrayBuffer();
+          if (chunk.byteLength > 0) {
+            state.offset = nextOffset;
+            state.queue.push(chunk);
+            appendQueuedChunks(state);
+          }
+        }
+        if (complete && nextOffset >= state.offset) {
+          finishLiveStream(state);
+        }
+      } catch (err) {
+        const hint = document.getElementById("liveHint");
+        if (hint) hint.textContent = `流式播放器等待重试：${err.message}`;
+      } finally {
+        state.fetching = false;
+      }
+    }
+
+    function appendQueuedChunks(state) {
+      if (!state.sourceBuffer || state.sourceBuffer.updating) return;
+      if (!state.queue.length) {
+        finishSourceBufferIfReady(state);
+        return;
+      }
+      const chunk = state.queue.shift();
+      state.sourceBuffer.appendBuffer(chunk);
+      state.sourceBuffer.addEventListener("updateend", () => {
+        updateLiveDuration(state);
+        if (state.followLive) jumpToLiveEdge(state.audio);
+        state.audio.play().catch(() => {});
+        finishSourceBufferIfReady(state);
+      }, { once: true });
+    }
+
+    function updateLiveDuration(state) {
+      const buffered = state.audio.buffered;
+      if (!buffered.length || state.mediaSource.readyState !== "open") return;
+      const end = buffered.end(buffered.length - 1);
+      if (Number.isFinite(end) && end > 0) {
+        state.mediaSource.duration = end;
+        const hint = document.getElementById("liveHint");
+        if (hint) hint.textContent = state.followLive ? `直播跟随中，已保留约 ${LIVE_BUFFER_SECONDS} 秒缓冲。` : "已拖到历史位置；拖到最右侧会继续跟随直播。";
+      }
+    }
+
+    function jumpToLiveEdge(audio) {
+      const buffered = audio.buffered;
+      if (!buffered.length) return;
+      const end = buffered.end(buffered.length - 1);
+      if (!Number.isFinite(end) || end <= 0) return;
+
+      const target = Math.max(0, end - LIVE_BUFFER_SECONDS);
+      if (Math.abs(audio.currentTime - target) > 0.65) {
+        audio.currentTime = target;
+      }
+    }
+
+    function isNearLiveEdge(audio) {
+      const buffered = audio.buffered;
+      if (!buffered.length) return true;
+      const end = buffered.end(buffered.length - 1);
+      return end - audio.currentTime <= LIVE_EDGE_THRESHOLD_SECONDS;
+    }
+
+    function finishLiveStream(state) {
+      state.ended = true;
+      if (state.timer) clearInterval(state.timer);
+      finishSourceBufferIfReady(state);
+      const hint = document.getElementById("liveHint");
+      if (hint) hint.textContent = "生成已完成，可以任意拖动回放。";
+    }
+
+    function finishSourceBufferIfReady(state) {
+      if (!state.ended || state.queue.length) return;
+      if (state.mediaSource.readyState === "open" && state.sourceBuffer && !state.sourceBuffer.updating) {
+        try { state.mediaSource.endOfStream(); } catch (_) {}
+      }
+    }
+
+    function uploadBoxHtml() {
+      return `
+        <div class="upload-box" data-intake-root>
+          <div class="upload-icon">↑</div>
+          <h2 class="upload-title">添加论文 PDF</h2>
+          <p class="upload-subtitle">上传本地文件，或粘贴 arXiv / 公开 PDF 链接。</p>
+          <div class="intake-tabs" role="tablist" aria-label="添加方式">
+            <button type="button" class="intake-tab active" data-intake-tab="file">上传文件</button>
+            <button type="button" class="intake-tab" data-intake-tab="url">论文链接</button>
+          </div>
+          <div class="intake-panel active" data-intake-panel="file">
+            <input class="file-input" id="pdfInput" type="file" accept="application/pdf,.pdf" />
+            <div class="file-name" id="fileName">尚未选择文件</div>
+          </div>
+          <div class="intake-panel" data-intake-panel="url">
+            <input class="url-input" id="pdfUrlInput" type="url" placeholder="https://arxiv.org/pdf/2607.13987" />
+            <div class="url-hint">支持 arXiv PDF / abs 链接，以及其他可直接下载的 PDF 地址。</div>
+          </div>
+          <div class="level-group" role="radiogroup" aria-label="浓缩档位">
+            <label class="level-option">
+              <input type="radio" name="condenseLevel" value="low" />
+              <span class="level-card"><strong>低档</strong><span>约 1100-1500 字，更快听到概要。</span></span>
+            </label>
+            <label class="level-option">
+              <input type="radio" name="condenseLevel" value="mid" checked />
+              <span class="level-card"><strong>中档</strong><span>约 2200-3000 字，默认平衡模式。</span></span>
+            </label>
+            <label class="level-option">
+              <input type="radio" name="condenseLevel" value="high" />
+              <span class="level-card"><strong>高档</strong><span>跳过压缩，直接使用全文。</span></span>
+            </label>
+          </div>
+          <br />
+          <button id="uploadBtn">开始任务</button>
+          <button id="urlSubmitBtn" style="display:none">下载并开始</button>
+        </div>
+      `;
+    }
+
+    function bindUpload(root = document) {
+      const intakeRoot = root.querySelector("[data-intake-root]") || root;
+      const button = intakeRoot.querySelector("#uploadBtn");
+      const urlButton = intakeRoot.querySelector("#urlSubmitBtn");
+      const input = intakeRoot.querySelector("#pdfInput");
+      const urlInput = intakeRoot.querySelector("#pdfUrlInput");
+      const box = intakeRoot.querySelector(".upload-box") || intakeRoot;
+      const fileName = intakeRoot.querySelector("#fileName");
+      const tabs = intakeRoot.querySelectorAll("[data-intake-tab]");
+      const panels = intakeRoot.querySelectorAll("[data-intake-panel]");
+      if (!button || !input) return;
+
+      let intakeMode = "file";
+      const setIntakeMode = (mode) => {
+        intakeMode = mode;
+        tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.intakeTab === mode));
+        panels.forEach(panel => panel.classList.toggle("active", panel.dataset.intakePanel === mode));
+        button.style.display = mode === "file" ? "" : "none";
+        if (urlButton) urlButton.style.display = mode === "url" ? "" : "none";
+      };
+      tabs.forEach(tab => {
+        tab.onclick = (event) => {
+          event.stopPropagation();
+          setIntakeMode(tab.dataset.intakeTab || "file");
+        };
+      });
+      setIntakeMode("file");
+      const setSelectedFile = (file) => {
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith(".pdf")) {
+          alert("请上传 PDF 文件");
+          return;
+        }
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        input.files = transfer.files;
+        if (fileName) fileName.textContent = file.name;
+      };
+      input.onchange = () => {
+        if (fileName) fileName.textContent = input.files.length ? input.files[0].name : "尚未选择文件";
+      };
+      if (box) {
+        box.addEventListener("click", (event) => {
+          if (intakeMode !== "file") return;
+          if (event.target.closest("button, .level-option, .intake-tab, .url-input")) return;
+          input.click();
+        });
+        ["dragenter", "dragover"].forEach(eventName => {
+          box.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            box.classList.add("dragover");
+          });
+        });
+        ["dragleave", "drop"].forEach(eventName => {
+          box.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            box.classList.remove("dragover");
+          });
+        });
+        box.addEventListener("drop", (event) => {
+          if (intakeMode !== "file") return;
+          const file = event.dataTransfer && event.dataTransfer.files[0];
+          setSelectedFile(file);
+        });
+      }
+
+      const selectedLevel = () => {
+        const levelInput = intakeRoot.querySelector("input[name='condenseLevel']:checked");
+        return levelInput ? levelInput.value : "mid";
+      };
+
+      button.onclick = async () => {
+        if (!input.files.length) return alert("请选择 PDF 文件");
+        button.disabled = true;
+        button.textContent = "上传中...";
+        const form = new FormData();
+        form.append("file", input.files[0]);
+        form.append("condense_level", selectedLevel());
+        try {
+          const task = await api("/api/tasks", { method: "POST", body: form });
+          selectedId = task.id;
+          await refreshTasks();
+          await startGeneration(task.id);
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          button.disabled = false;
+          button.textContent = "开始任务";
+        }
+      };
+
+      if (urlButton && urlInput) {
+        urlButton.onclick = async () => {
+          const pdfUrl = urlInput.value.trim();
+          if (!pdfUrl) return alert("请输入论文 PDF 链接");
+          urlButton.disabled = true;
+          urlButton.textContent = "下载中...";
+          const form = new FormData();
+          form.append("pdf_url", pdfUrl);
+          form.append("condense_level", selectedLevel());
+          try {
+            const task = await api("/api/tasks/from-url", { method: "POST", body: form });
+            selectedId = task.id;
+            await refreshTasks();
+            await startGeneration(task.id);
+          } catch (err) {
+            alert(err.message);
+          } finally {
+            urlButton.disabled = false;
+            urlButton.textContent = "下载并开始";
+          }
+        };
+      }
+    }
+
+    async function startGeneration(taskId) {
+      await api(`/api/tasks/${taskId}/generate`, { method: "POST" });
+      await refreshTasks();
+      startPolling();
+    }
+
+    async function pauseGeneration(taskId) {
+      await api(`/api/tasks/${taskId}/pause`, { method: "POST" });
+      await refreshTasks();
+      startPolling();
+    }
+
+    async function refreshOne() {
+      if (!selectedId) return refreshTasks();
+      const task = await api(`/api/tasks/${selectedId}`);
+      tasks = tasks.map(t => t.id === selectedId ? task : t);
+      renderSidebar();
+      renderPanel();
+    }
+
+    function taskNeedsPolling(task) {
+      if (!task) return false;
+      return task.status === "generating"
+        || task.status === "pausing"
+        || taskHasGeneratingVideo(task);
+    }
+
+    function startPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        await refreshTasks();
+        const task = selectedTask();
+        if (!taskNeedsPolling(task)) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }, 2500);
+    }
+
+    function shouldPoll() {
+      return taskNeedsPolling(selectedTask());
+    }
+
+    document.getElementById("newTaskBtn").onclick = () => {
+      selectedId = NEW_TASK_ID;
+      renderSidebar();
+      renderPanel();
+    };
+
+    function escapeHtml(text) {
+      return String(text || "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[c]));
+    }
+
+    function safeExternalUrl(url) {
+      try {
+        const parsed = new URL(String(url || ""));
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "#";
+        return parsed.href;
+      } catch (_) {
+        return "#";
+      }
+    }
+
+    refreshTasks().then(() => {
+      if (shouldPoll()) startPolling();
+    });
+  </script>
+</body>
+</html>
